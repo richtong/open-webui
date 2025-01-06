@@ -3,12 +3,13 @@ import json
 import logging
 import os
 import pkgutil
-import sys
 import shutil
+import sys
 from pathlib import Path
 
 import markdown
 from bs4 import BeautifulSoup
+
 from open_webui.constants import ERROR_MESSAGES
 
 ####################################
@@ -55,11 +56,13 @@ else:
 
 try:
     import torch
-
     if torch.backends.mps.is_available() and torch.backends.mps.is_built():
         DEVICE_TYPE = "mps"
-except Exception:
+except Exception as e:
+    print(f"Apple Silicon test failed {e=}")
     pass
+
+print(f"{DEVICE_TYPE=}")
 
 ####################################
 # LOGGING
@@ -154,7 +157,7 @@ def parse_section(section):
 
 try:
     changelog_path = BASE_DIR / "CHANGELOG.md"
-    with open(str(changelog_path.absolute()), "r", encoding="utf8") as file:
+    with open(str(changelog_path.absolute()), encoding="utf8") as file:
         changelog_content = file.read()
 
 except Exception:
@@ -252,7 +255,7 @@ FRONTEND_BUILD_DIR = Path(os.getenv("FRONTEND_BUILD_DIR", BASE_DIR / "build")).r
 
 if FROM_INIT_PY:
     FRONTEND_BUILD_DIR = Path(
-        os.getenv("FRONTEND_BUILD_DIR", OPEN_WEBUI_DIR / "frontend")
+        os.getenv("FRONTEND_BUILD_DIR", OPEN_WEBUI_DIR / "frontend"),
     ).resolve()
 
 
@@ -335,7 +338,7 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
 WEBUI_AUTH = os.environ.get("WEBUI_AUTH", "True").lower() == "true"
 WEBUI_AUTH_TRUSTED_EMAIL_HEADER = os.environ.get(
-    "WEBUI_AUTH_TRUSTED_EMAIL_HEADER", None
+    "WEBUI_AUTH_TRUSTED_EMAIL_HEADER", None,
 )
 WEBUI_AUTH_TRUSTED_NAME_HEADER = os.environ.get("WEBUI_AUTH_TRUSTED_NAME_HEADER", None)
 
@@ -350,7 +353,7 @@ BYPASS_MODEL_ACCESS_CONTROL = (
 WEBUI_SECRET_KEY = os.environ.get(
     "WEBUI_SECRET_KEY",
     os.environ.get(
-        "WEBUI_JWT_SECRET_KEY", "t0p-s3cr3t"
+        "WEBUI_JWT_SECRET_KEY", "t0p-s3cr3t",
     ),  # DEPRECATED: remove at next major version
 )
 
@@ -386,7 +389,7 @@ else:
         AIOHTTP_CLIENT_TIMEOUT = 300
 
 AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST = os.environ.get(
-    "AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST", ""
+    "AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST", "",
 )
 
 if AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST == "":
@@ -394,7 +397,7 @@ if AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST == "":
 else:
     try:
         AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST = int(
-            AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST
+            AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST,
         )
     except Exception:
         AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST = 5
