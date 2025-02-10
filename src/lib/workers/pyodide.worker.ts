@@ -66,12 +66,14 @@ async function loadPyodideAndPackages(packages: string[] = []) {
 self.onmessage = async (event) => {
 	const { id, code, ...context } = event.data;
 
+	console.log('testing');
 	console.log(event.data);
 
 	// The worker copies the context in its own "memory" (an object mapping name to values)
 	for (const key of Object.keys(context)) {
 		self[key] = context[key];
 	}
+	console.log('testing 2');
 
 	// make sure loading is done
 	await loadPyodideAndPackages(self.packages);
