@@ -74,7 +74,7 @@ const executeCode = async (id: string, code: string) => {
 		// Connect to localhost file system
 		console.log('mounting /');
 		self.pyodide.mountNodeFS('/', '/mnt');
-		console.log('mounted /');
+		console.log('pyodide:mountNodeFS mounted / to /mnt');
 		// Execute the Python code
 		const result = await self.pyodide.runPythonAsync(code);
 		self.cells[id].result = result;
