@@ -19,6 +19,7 @@ type CellState = {
 };
 
 const initializePyodide = async () => {
+	console.log('initializePyodide');
 	// Ensure Pyodide is loaded once and cached in the worker's global scope
 	if (!self.pyodide) {
 		self.indexURL = '/pyodide/';
@@ -72,6 +73,7 @@ const executeCode = async (id: string, code: string) => {
 		});
 
 		// Execute the Python code
+		console.log('runPythonAsync', code);
 		const result = await self.pyodide.runPythonAsync(code);
 		self.cells[id].result = result;
 		self.cells[id].status = 'completed';
@@ -91,6 +93,7 @@ const executeCode = async (id: string, code: string) => {
 // Handle messages from the main thread
 self.onmessage = async (event) => {
 	const { type, id, code, ...args } = event.data;
+	console.log(type, id, code, args);
 
 	switch (type) {
 		case 'initialize':

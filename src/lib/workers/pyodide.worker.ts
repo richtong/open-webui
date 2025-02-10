@@ -66,7 +66,7 @@ async function loadPyodideAndPackages(packages: string[] = []) {
 self.onmessage = async (event) => {
 	const { id, code, ...context } = event.data;
 
-	console.log(event.data);
+	console.log('onmessage', event.data);
 
 	// The worker copies the context in its own "memory" (an object mapping name to values)
 	for (const key of Object.keys(context)) {
@@ -106,6 +106,7 @@ def show(*, block=None):
 matplotlib.pyplot.show = show`);
 		}
 
+		console.log('pyodide.worker.ts');
 		self.result = await self.pyodide.runPythonAsync(code);
 
 		// Safely process and recursively serialize the result
@@ -133,7 +134,8 @@ matplotlib.pyplot.show = show`);
 };
 
 function processResult(result: any): any {
-	// Catch and always return JSON-safe string representations
+	// Catch and always return jSON-safe string representations
+	console.log('processResult', result);
 	try {
 		if (result == null) {
 			// Handle null and undefined
