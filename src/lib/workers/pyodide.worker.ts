@@ -40,9 +40,18 @@ async function loadPyodideAndPackages(packages: string[] = []) {
 		packages: ['micropip']
 	});
 
+	console.log('Mounting directories');
 	let mountDir = '/mnt';
 	self.pyodide.FS.mkdirTree(mountDir);
-	// self.pyodide.FS.mount(self.pyodide.FS.filesystems.IDBFS, {}, mountDir);
+	// https://pyodide.org/en/stable/usage/file-system.html
+	console.log('Mounting IDBFS');
+	self.pyodide.FS.mount(self.pyodide.FS.filesystems.IDBFS, {}, mountDir);
+
+	// does not work with vite
+	console.log('Mounting NODEFS');
+	let nodeDir = '/volume';
+	self.pyodide.FS.mount(self.pyodide.FS.filesystems.NODEFS, { root: '.' }, nodeDir);
+	console.log('Mounted NODEFS');
 
 	// // Load persisted files from IndexedDB (Initial Sync)
 	// await new Promise<void>((resolve, reject) => {
@@ -66,14 +75,14 @@ async function loadPyodideAndPackages(packages: string[] = []) {
 self.onmessage = async (event) => {
 	const { id, code, ...context } = event.data;
 
-	console.log('testing');
+	console.log('onmessage');
 	console.log(event.data);
 
 	// The worker copies the context in its own "memory" (an object mapping name to values)
 	for (const key of Object.keys(context)) {
 		self[key] = context[key];
 	}
-	console.log('testing 2');
+	console.log('calling loadPyodideAndPackages');
 
 	// make sure loading is done
 	await loadPyodideAndPackages(self.packages);
@@ -108,7 +117,9 @@ def show(*, block=None):
 matplotlib.pyplot.show = show`);
 		}
 
+		console.log('calling runPythonAsync');
 		self.result = await self.pyodide.runPythonAsync(code);
+		console.log('returned runPythonAsync');
 
 		// Safely process and recursively serialize the result
 		self.result = processResult(self.result);
